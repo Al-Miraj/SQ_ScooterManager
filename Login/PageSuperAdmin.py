@@ -1,12 +1,11 @@
 from Login.PageBase import PageBase
 
-from Models.User import User
 from Utils.InputValidator import InputHandler
 
 
 
 
-class PageSuperAdmin(PageBase[User]):
+class PageSuperAdmin(PageBase):
     def Run(self):
         while True:
             self.printMenu()

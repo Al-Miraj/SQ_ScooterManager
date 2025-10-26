@@ -1,11 +1,11 @@
 # this is the main file. 
 # starting the application should be done by running this file
-from Database.DBConfig import DBConfig
+from Database.MainDb import MainDb
 
 from Models.Traveler import Traveler
 from Models.Scooter import Scooter
 from Models.User import User
-from Utils.security import verify_password
+from Utils.AuthHandler import AuthHandler
 from Utils.InputValidator import InputHandler
 
 #////////////
@@ -22,14 +22,14 @@ import Utils.logger as l
 
 
 def reset_db():
-    DBConfig.scootersDAO.deleteAllScooters()
-    DBConfig.usersDAO.deleteAllUsers()
-    DBConfig.travelersDAO.deleteAllTravelers()
+    MainDb.scooters().deleteAllScooters()
+    MainDb.users().deleteAllUsers()
+    MainDb.travelers().deleteAllTravelers()
 
     # check if db is empty
-    if (len(DBConfig.scootersDAO.getAllScooters()) != 0) or \
-       (len(DBConfig.usersDAO.getAllUsers()) != 0) or \
-       (len(DBConfig.travelersDAO.getAllTravelers()) != 0):
+    if (len(MainDb.scooters().getAllScooters()) != 0) or \
+       (len(MainDb.users().getAllUsers()) != 0) or \
+       (len(MainDb.travelers().getAllTravelers()) != 0):
         print("Database reset unsuccessful, aborting...")
         return
 
@@ -47,18 +47,19 @@ def reset_db():
         travelers = [Traveler(**data) for data in travelers_data]
 
     # Insert seed data through DAOs
-    DBConfig.scootersDAO.insertScooters(scooters)
-    DBConfig.usersDAO.insertUsers(users)
-    DBConfig.travelersDAO.insertTravelers(travelers)
+    MainDb.scooters().insertScooters(scooters)
+    MainDb.users().insertUsers(users)
+    MainDb.travelers().insertTravelers(travelers)
 
-    print("dbconfig scooters:", DBConfig.scootersDAO.getAllScooters())
-    print("dbconfig users:", DBConfig.usersDAO.getAllUsers())
-    print("dbconfig travelers:", DBConfig.travelersDAO.getAllTravelers())
+    print("dbconfig scooters:", MainDb.scooters().getAllScooters())
+    print("dbconfig users:", MainDb.users().getAllUsers())
+    print("dbconfig travelers:", MainDb.travelers().getAllTravelers())
     print("Database reset successful.")
 
 
 if __name__ == "__main__":
-    reset_db()
+    MainDb.initialize()
+    # reset_db()
 
     print("--start--\n\n")
 
@@ -66,42 +67,33 @@ if __name__ == "__main__":
     username = input("username: ")
     password = input("password: ")
     if InputHandler.checkUsernameFormat(username) and InputHandler.checkPasswordFormat(password):
-        loginUser = DBConfig.usersDAO.getUserByUsername(username)
-        if loginUser != None:
-            result = verify_password(password, loginUser.Password)
-            if result:
-                page = None
+        if (not AuthHandler.login(username, password)):
+            print("Log in attempt failed")
+            l.logEvent(username, "Failed Login attempt by wrong username or password", suspicious= True)
+            exit()
+        
+        page = None
+        role = AuthHandler.getCurrentUser().Role
 
-                if loginUser.Role != "ServiceEngineer" and loginUser.Role != "SystemAdmin" and loginUser.Role != "SuperAdmin":
-                    print("User found without defined role. logging out.")
-                    exit()
+        if role != "ServiceEngineer" and role != "SystemAdmin" and role != "SuperAdmin":
+            print("User found without defined role. logging out.")
+            exit()
 
-                username_ = loginUser.Username
-                password_ = loginUser.Password
-                firstName = loginUser.FirstName
-                lastName = loginUser.LastName
-                registrationDate = loginUser.RegistrationDate
-                user = User(username_, password_, firstName, lastName, registrationDate)
-                l.logEvent(user.Username, "Succesful Login")
+        l.logEvent(AuthHandler.getCurrentUser().Username, "Succesful Login")
 
-                if loginUser.Role == "ServiceEngineer":
-                    print("Welcome Service Engineer " + loginUser.FirstName)
-                    page = PageServiceEngineer(user)
-                elif loginUser.Role == "SystemAdmin":
-                    print("Welcome System Admin " + loginUser.FirstName)
-                    page = PageSystemAdmin(user)
-                elif loginUser.Role == "SuperAdmin":
-                    print("Welcome Super Admin " + loginUser.FirstName + " " + loginUser.LastName)
-                    page = PageSuperAdmin(user)
-                
-                if page != None:
-                    page.Run()
-            else:
-                print("Log in attempt failed")
-                l.logEvent(username, "Failed Login attempt by wrong password", suspicious= True)
-        else:
-            print("Log in attempt failed.")
-            l.logEvent(username, "Failed Login attempt by username not found", suspicious= True)
+        firstName = AuthHandler.getCurrentUser().FirstName
+        if role == "ServiceEngineer":
+            print("Welcome Service Engineer " + firstName)
+            page = PageServiceEngineer()
+        elif role == "SystemAdmin":
+            print("Welcome System Admin " + firstName)
+            page = PageSystemAdmin()
+        elif role == "SuperAdmin":
+            print("Welcome Super Admin " + firstName)
+            page = PageSuperAdmin()
+
+        if page != None:
+            page.Run()
     else:
         print("Invalid input for username or password")
 

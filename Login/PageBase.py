@@ -1,17 +1,15 @@
-from typing import Generic, TypeVar
 from Models.User import User
+from Utils.AuthHandler import AuthHandler
 from Utils.security import verify_password, hash_password
-from Database.DBConfig import DBConfig
+from Database.MainDb import MainDb
 
 from Utils.InputValidator import InputHandler
 import Utils.logger as l
-import Utils.backupMaker as b
+import Utils.backupService as b
 
-T = TypeVar("T", bound=User)
-
-class PageBase(Generic[T]):
-    def __init__(self, user: T):
-        self.User = user
+class PageBase():
+    def __init__(self):
+        self.User = AuthHandler.getCurrentUser()
     
     def runUpdatePasswordUI(self):
         print("Update new password.\n")
@@ -25,7 +23,7 @@ class PageBase(Generic[T]):
                     if newPassword == newPasswordRepeat:
                         newPasswordHashed = hash_password(newPassword + self.User.Username)
 
-                        result = DBConfig.usersDAO.updateUserPassword(self.User.Username, self.User.Password)
+                        result = MainDb.users().updateUserPassword(self.User.Username, self.User.Password)
                         if result:
                             print("Password has been updated.")
                             l.logEvent(self.User.Username, "Updating password succesful")
@@ -42,7 +40,7 @@ class PageBase(Generic[T]):
     
     def runViewAllUsersUI(self):
         print("View all users.\n")
-        users = DBConfig.usersDAO.getAllUsers()
+        users = MainDb.users().getAllUsers()
         for user in users:
             print(user)
             print()
@@ -61,7 +59,7 @@ class PageBase(Generic[T]):
                 if InputHandler.checkPasswordFormat(passwordRepeat):
                     if InputHandler.checkFirstName(firstName):
                         if InputHandler.checkLastName(lastName):
-                            login_user = DBConfig.usersDAO.getUserByUsername(username)
+                            login_user = MainDb.users().getUserByUsername(username)
                             passwordIsConfirmed = password == passwordRepeat
                             usernameNotFound = login_user == None
 
@@ -75,7 +73,7 @@ class PageBase(Generic[T]):
                                     print(f"Role of new user unclear. Adding {role} failed.")
 
                                 if user != None:
-                                    result = DBConfig.usersDAO.insertUsers([user])
+                                    result = MainDb.users().insertUsers([user])
                                     if result:
                                         print(f"{role} succesfully added:\n")
                                         print(user)
@@ -106,7 +104,7 @@ class PageBase(Generic[T]):
 
         username = input(f"Enter the username of the {role} you want to delete: ")
         if InputHandler.checkUsernameFormat(username):
-            user = DBConfig.usersDAO.getUserByUsername(username)
+            user = MainDb.users().getUserByUsername(username)
             if user != None and user.Role == role: # user found and is of role to delete
                 print(user)
                 print()
@@ -117,7 +115,7 @@ class PageBase(Generic[T]):
                         password = input("Password: ")
                         if InputHandler.checkPasswordFormat(password):
                             if verify_password(password + self.User.Username, self.User.Password):
-                                result = DBConfig.usersDAO.deleteUser(user.Username)
+                                result = MainDb.users().deleteUser(user.Username)
                                 if result:
                                     print(f"{role} deleted succesfully")
                                     l.logEvent(self.User.Username, f"Deleting {role} ({user.Username}) succesful")
@@ -148,7 +146,7 @@ class PageBase(Generic[T]):
 
         username = input(f"Enter the username of the {role} you want to update: ")
         if InputHandler.checkUsernameFormat(username):
-            user = DBConfig.usersDAO.getUserByUsername(username)
+            user = MainDb.users().getUserByUsername(username)
             if user != None and user.Role == role:
                 print(user)
                 print()
@@ -191,7 +189,7 @@ class PageBase(Generic[T]):
                 print("New First Name is identical to old First Name. Updating Service Engineer First Name canceled.")
             else:
                 serviceEngineer.FirstName = newFirstName
-                result = DBConfig.usersDAO.updateUserFirstName(serviceEngineer.Username, serviceEngineer.FirstName)
+                result = MainDb.users().updateUserFirstName(serviceEngineer.Username, serviceEngineer.FirstName)
                 if result:
                     print("Updated Service Engineer First Name succesfully.")
                     l.logEvent(self.User.Username, f"Updating ServiceEngineer ({serviceEngineer.Username}) first name succesful")
@@ -208,7 +206,7 @@ class PageBase(Generic[T]):
                 print("New Last Name is identical to old Last Name. Updating Service Engineer Last Name canceled.")
             else:
                 serviceEngineer.LastName = newLastName
-                result = DBConfig.usersDAO.updateUserLastName(serviceEngineer.Username, serviceEngineer.LastName)
+                result = MainDb.users().updateUserLastName(serviceEngineer.Username, serviceEngineer.LastName)
                 if result:
                     print("Updated Service Engineer Last Name succesfully.")
                     l.logEvent(self.User.Username, f"Updating ServiceEngineer ({serviceEngineer.Username}) last name succesful")
@@ -224,7 +222,7 @@ class PageBase(Generic[T]):
 
         username = input(f"Enter the username of the {role} you want to reset the password of: ")
         if InputHandler.checkUsernameFormat(username):
-            user = DBConfig.usersDAO.getUserByUsername(username)
+            user = MainDb.users().getUserByUsername(username)
             if user != None and user.Role == role:
                 print(user)
                 print()
@@ -235,7 +233,7 @@ class PageBase(Generic[T]):
                         password = input("Password: ")
                         if InputHandler.checkPasswordFormat(password):
                             if verify_password(password + self.User.Username, self.User.Password):
-                                result = DBConfig.usersDAO.updateUserPassword(username, hash_password("Temp123!" + username))
+                                result = MainDb.users().updateUserPassword(username, hash_password("Temp123!" + username))
                                 if result:
                                     print(f"Ressetted {role} password succesfully")
                                     l.logEvent(self.User.Username, f"Resetting {role} password ({user.Username}) succesful")
@@ -287,7 +285,7 @@ class PageBase(Generic[T]):
                 print("New First Name is identical to old First Name. Updating System Admin First Name canceled.")
             else:
                 systemAdmin.FirstName = newFirstName
-                result = DBConfig.usersDAO.updateUserFirstName(systemAdmin.Username, systemAdmin.FirstName)
+                result = MainDb.users().updateUserFirstName(systemAdmin.Username, systemAdmin.FirstName)
                 if result:
                     print("Updated System Admin First Name succesfully.")
                     l.logEvent(self.User.Username, f"Updating SystemAdmin ({systemAdmin.Username}) first name succesful")
@@ -305,7 +303,7 @@ class PageBase(Generic[T]):
                 print("New Last Name is identical to old Last Name. Updating System Admin Last Name canceled.")
             else:
                 systemAdmin.LastName = newLastName
-                result = DBConfig.usersDAO.updateUserLastName(systemAdmin.Username, systemAdmin.LastName)
+                result = MainDb.users().updateUserLastName(systemAdmin.Username, systemAdmin.LastName)
                 if result:
                     print("Updated System Admin Last Name succesfully.")
                     l.logEvent(self.User.Username, f"Updating SystemAdmin ({systemAdmin.Username}) last name succesful")
@@ -329,7 +327,7 @@ class PageBase(Generic[T]):
                     password = input("Password: ")
                     if InputHandler.checkPasswordFormat(password):
                         if verify_password(password + self.User.Username, self.User.Password):
-                            result = DBConfig.usersDAO.deleteUser(self.User.Username)
+                            result = MainDb.users().deleteUser(self.User.Username)
                             if result:
                                 print("Your Account has been deleted succesfully")
                                 l.logEvent(self.User.Username, f"Deleting own account succesful")
@@ -362,7 +360,7 @@ class PageBase(Generic[T]):
 
         serialNumber = input("Enter the Serial Number of the scooter you want to update: ")
         if InputHandler.checkScooterSerialNumber(serialNumber):
-            scooter = DBConfig.scootersDAO.getScooterBySerialNumber(serialNumber)
+            scooter = MainDb.scooters().getScooterBySerialNumber(serialNumber)
             if scooter != None:
                 print(scooter)
                 print()
@@ -425,7 +423,7 @@ class PageBase(Generic[T]):
         if InputHandler.checkChargePercentage(newSoC):
             newSoCFloat = float(newSoC)
             scooter.StateOfCharge = newSoCFloat
-            result = DBConfig.scootersDAO.updateScooterStateOfCharge(scooter.SerialNumber, str(scooter.StateOfCharge))
+            result = MainDb.scooters().updateScooterStateOfCharge(scooter.SerialNumber, str(scooter.StateOfCharge))
             if result:
                 print("Updated State of Charge succesfully.")
                 l.logEvent(self.User.Username, f"Updating Scooter State of Charge ({scooter.SerialNumber}) succesful")
@@ -451,7 +449,7 @@ class PageBase(Generic[T]):
                 if newMinFloat <= newMaxFloat:
                     scooter.TargetSoCMin = newMinFloat
                     scooter.TargetSoCMax = newMaxFloat
-                    result = DBConfig.scootersDAO.updateScooterTargetRangeSoC(scooter.SerialNumber, str(scooter.TargetSoCMin), str(scooter.TargetSoCMax))
+                    result = MainDb.scooters().updateScooterTargetRangeSoC(scooter.SerialNumber, str(scooter.TargetSoCMin), str(scooter.TargetSoCMax))
                     if result:
                         print("Updated State of Charge succesfully.")
                         print(f"Current Target Range State of Charge: {scooter.TargetSoCMin}% - {scooter.TargetSoCMax}%")
@@ -482,7 +480,7 @@ class PageBase(Generic[T]):
                     newLongFloat = float(newLong)
                     scooter.LocationLatitude = newLatFloat
                     scooter.LocationLongitude = newLongFloat
-                    result = DBConfig.scootersDAO.updateScooterLocation(scooter.SerialNumber, str(scooter.LocationLatitude), str(scooter.LocationLongitude))
+                    result = MainDb.scooters().updateScooterLocation(scooter.SerialNumber, str(scooter.LocationLatitude), str(scooter.LocationLongitude))
                     if result:
                         print("Updated scooter Location successfully.")
                         l.logEvent(self.User.Username, f"Updating Scooter Location ({scooter.SerialNumber}) succesful")
@@ -505,7 +503,7 @@ class PageBase(Generic[T]):
         if InputHandler.checkConfirmChoice(confirmFlip):
             if confirmFlip == "y":
                 scooter.OutOfServiceStatus = 0 if scooter.OutOfServiceStatus == 1 else 1
-                result = DBConfig.scootersDAO.updateScooterOutOfServiceStatus(scooter.SerialNumber, str(scooter.OutOfServiceStatus))
+                result = MainDb.scooters().updateScooterOutOfServiceStatus(scooter.SerialNumber, str(scooter.OutOfServiceStatus))
                 if result:
                     print("Updated scooter Out of Service Status successfully.")
                     l.logEvent(self.User.Username, f"Updating Scooter Out of Service Status ({scooter.SerialNumber}) succesful")
@@ -525,7 +523,7 @@ class PageBase(Generic[T]):
         if InputHandler.checkMileage(newMileage):
             newMileageInt = int(newMileage)
             scooter.Mileage = newMileageInt
-            result = DBConfig.scootersDAO.updateScooterMileage(scooter.SerialNumber, str(scooter.Mileage))
+            result = MainDb.scooters().updateScooterMileage(scooter.SerialNumber, str(scooter.Mileage))
             if result:
                 print("Updated Mileage succesfully.")
                 l.logEvent(self.User.Username, f"Updating Scooter Mileage ({scooter.SerialNumber}) succesful")
@@ -545,7 +543,7 @@ class PageBase(Generic[T]):
         newBrand = input("Enter the new Brand: ")
         if InputHandler.checkBrand(newBrand):
             scooter.Brand = newBrand
-            result = DBConfig.scootersDAO.updateScooterBrand(scooter.SerialNumber, scooter.Brand)
+            result = MainDb.scooters().updateScooterBrand(scooter.SerialNumber, scooter.Brand)
             if result:
                 print("Updated Brand succesfully.")
                 l.logEvent(self.User.Username, f"Updating Scooter Brand ({scooter.SerialNumber}) succesful")
@@ -562,7 +560,7 @@ class PageBase(Generic[T]):
         newModel = input("Enter the new Model: ")
         if InputHandler.checkModel(newModel):
             scooter.Model = newModel
-            result = DBConfig.scootersDAO.updateScooterModel(scooter.SerialNumber, scooter.Model)
+            result = MainDb.scooters().updateScooterModel(scooter.SerialNumber, scooter.Model)
             if result:
                 print("Updated Model succesfully.")
                 l.logEvent(self.User.Username, f"Updating Scooter Model ({scooter.SerialNumber}) succesful")
@@ -580,7 +578,7 @@ class PageBase(Generic[T]):
         if InputHandler.checkTopSpeed(newTopSpeed):
             newTopSpeedFloat = float(newTopSpeed)
             scooter.TopSpeed = newTopSpeedFloat
-            result = DBConfig.scootersDAO.updateScooterTopSpeed(scooter.SerialNumber, str(scooter.TopSpeed))
+            result = MainDb.scooters().updateScooterTopSpeed(scooter.SerialNumber, str(scooter.TopSpeed))
             if result:
                 print("Updated Top Speed succesfully.")
                 l.logEvent(self.User.Username, f"Updating Scooter Top Speed ({scooter.SerialNumber}) succesful")
@@ -598,7 +596,7 @@ class PageBase(Generic[T]):
         if InputHandler.checkBattaryCapacity(newBatteryCapacity):
             newBatteryCapacityFloat = float(newBatteryCapacity)
             scooter.BatteryCapacity = newBatteryCapacityFloat
-            result = DBConfig.scootersDAO.updateScooterBatteryCapacity(scooter.SerialNumber, str(scooter.BatteryCapacity))
+            result = MainDb.scooters().updateScooterBatteryCapacity(scooter.SerialNumber, str(scooter.BatteryCapacity))
             if result:
                 print("Updated Battery Capacity succesfully.")
                 l.logEvent(self.User.Username, f"Updating Scooter Battery Capacity ({scooter.SerialNumber}) succesful")
@@ -630,7 +628,7 @@ class PageBase(Generic[T]):
 
     def runMakeBackupUI(self):
         print("Make Backup.\n")
-        b.makeBackup(self.User)
+        # b.makeBackup(self.User)
     
     def runRestoreBackupUI(self):
         print("Not implemented sorri :(")

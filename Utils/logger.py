@@ -2,9 +2,9 @@ import os
 import json
 from datetime import datetime
 from Utils.security import encrypt, decrypt
-from Database.DBConfig import DBConfig
+from Database.MainDb import MainDb
 
-logFilePath = DBConfig.logFilePath
+logFilePath = MainDb.logFilePath
 
 def _loadLogs():
     if not os.path.exists(logFilePath):
