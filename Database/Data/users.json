@@ -1,0 +1,106 @@
+[
+    {
+        "Username": "super_admin",
+        "Password": "Admin_123?",
+        "FirstName": "John",
+        "LastName": "Doe",
+        "RegistrationDate": "2024-06-12T09:00:00",
+        "Role": "SuperAdmin"
+    },
+    {
+        "Username": "john_doe1",
+        "Password": "Password111!",
+        "FirstName": "Alice",
+        "LastName": "Smith",
+        "RegistrationDate": "2024-06-12T09:00:01",
+        "Role": "SystemAdmin"
+    },
+    {
+        "Username": "_user2023",
+        "Password": "Password111!",
+        "FirstName": "Bob",
+        "LastName": "Johnson",
+        "RegistrationDate": "2024-06-12T09:00:02",
+        "Role": "ServiceEngineer"
+    },
+    {
+        "Username": "alice.bob",
+        "Password": "Password111!",
+        "FirstName": "Emily",
+        "LastName": "Brown",
+        "RegistrationDate": "2024-06-12T09:00:03",
+        "Role": "ServiceEngineer"
+    },
+    {
+        "Username": "marko_99",
+        "Password": "Password111!",
+        "FirstName": "David",
+        "LastName": "Williams",
+        "RegistrationDate": "2024-06-12T09:00:04",
+        "Role": "SystemAdmin"
+    },
+    {
+        "Username": "dev_admin",
+        "Password": "Password111!",
+        "FirstName": "Sophia",
+        "LastName": "Jones",
+        "RegistrationDate": "2024-06-12T09:00:05",
+        "Role": "ServiceEngineer"
+    },
+    {
+        "Username": "charlie9",
+        "Password": "Password111!",
+        "FirstName": "James",
+        "LastName": "Miller",
+        "RegistrationDate": "2024-06-12T09:00:06",
+        "Role": "SystemAdmin"
+    },
+    {
+        "Username": "luna.moon",
+        "Password": "Password111!",
+        "FirstName": "Emma",
+        "LastName": "Davis",
+        "RegistrationDate": "2024-06-12T09:00:07",
+        "Role": "ServiceEngineer"
+    },
+    {
+        "Username": "alpha007",
+        "Password": "Password111!",
+        "FirstName": "Michael",
+        "LastName": "Wilson",
+        "RegistrationDate": "2024-06-12T09:00:08",
+        "Role": "ServiceEngineer"
+    },
+    {
+        "Username": "max.power",
+        "Password": "Password111!",
+        "FirstName": "Olivia",
+        "LastName": "Taylor",
+        "RegistrationDate": "2024-06-12T09:00:09",
+        "Role": "SystemAdmin"
+    },
+    {
+        "Username": "s_user01",
+        "Password": "Password111!",
+        "FirstName": "Daniel",
+        "LastName": "Anderson",
+        "RegistrationDate": "2024-06-12T09:00:10",
+        "Role": "ServiceEngineer"
+    },
+    {
+        "Username": "zebra_123",
+        "Password": "Password111!",
+        "FirstName": "Ava",
+        "LastName": "White",
+        "RegistrationDate": "2024-06-12T09:00:11",
+        "Role": "ServiceEngineer"
+    },
+    {
+        "Username": "s_user001",
+        "Password": "Password111!",
+        "FirstName": "Matthew",
+        "LastName": "Martinez",
+        "RegistrationDate": "2024-06-12T09:00:12",
+        "Role": "ServiceEngineer"
+    }
+]
