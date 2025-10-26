@@ -26,11 +26,12 @@ class MainDb:
     @classmethod
     def initialize(cls):
         cls.mainConn = cls.connect()
+        cls.backupConn = cls.connect()
         cls.__users = UsersDAO(cls.mainConn)
         cls.__scooters = ScootersDAO(cls.mainConn)
         cls.__travelers = TravelersDAO(cls.mainConn)
-        cls.__backupCodes = BackupCodesDAO(cls.mainConn)
-        cls.__backups = BackupsDAO(cls.mainConn)
+        cls.__backupCodes = BackupCodesDAO(cls.backupConn)
+        cls.__backups = BackupsDAO(cls.backupConn)
 
     @classmethod
     def users(cls) -> UsersDAO:
