@@ -20,15 +20,17 @@ class BackupsDAO:
             insertBackupQ = """INSERT OR IGNORE INTO backups (filename, hash, username)
                             VALUES (?, ?, ?)"""
             insertBackupValues = [encrypt(backup.filename), 
-                                  encrypt(backup.hash), 
-                                  encrypt(backup.username)]
+                                encrypt(backup.hash), 
+                                encrypt(backup.username)]
+            
             cursor.execute(insertBackupQ, insertBackupValues)
-            self.cache[backup.id] = backup
-        self.conn.commit()
+            self.cache[backup.filename] = backup
+            self.conn.commit()            
         if cursor.rowcount > 0:
             cursor.close()
             return True
         else:
+            self.conn.rollback()
             cursor.close()
             return False
 
@@ -72,8 +74,9 @@ class BackupsDAO:
         backups = cursor.execute("SELECT * FROM backups").fetchall()
 
         for b in backups:
-            if b[3] == filename:
-                cursor.execute("DELETE FROM backups WHERE filename = ?", [b[3]])
+            test_filename = decrypt(b[0])
+            if test_filename == filename:
+                cursor.execute("DELETE FROM backups WHERE filename = ?", [b[0]])
                 break
 
         self.conn.commit()

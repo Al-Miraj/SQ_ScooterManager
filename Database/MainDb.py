@@ -8,15 +8,16 @@ from Database.DataAccesObjects.ScootersDAO import ScootersDAO
 from Database.DataAccesObjects.TravelersDAO import TravelersDAO
 
 class MainDb:
-    databaseFile = "UrbanMobilityDB.db"
-    databasePath = "Database\\UrbanMobilityDB.db"
-    backupFile = "Backups.db"
-    backupFilePath = "Database\\Backups.db"
-
-    logFilePath = "Database\\Data\\SystemLogs.enc"
-    backupPath = "Database\\Backups"
     mainConn = None
+    databaseFile = "UrbanMobilityDB.db"
+    databasePath = "Database/UrbanMobilityDB.db"
+    
     backupConn = None
+    backupFile = "Backups.db"
+    backupFilePath = "Database/Backups.db"
+
+    logFilePath = "Database/Data/SystemLogs.enc"
+
     __users = None
     __scooters = None
     __travelers = None
@@ -58,7 +59,11 @@ class MainDb:
     def connect(cls, file):
         return sqlite3.connect(os.path.join(os.path.dirname(__file__), file))
 
-    def disconnect(self):
-        if self.mainConn:
-            self.mainConn.close()
-            self.mainConn = None
+    @classmethod
+    def disconnect(cls):
+        if cls.mainConn:
+            cls.mainConn.close()
+            cls.mainConn = None
+        if cls.backupConn:
+            cls.backupConn.close()
+            cls.backupConn = None

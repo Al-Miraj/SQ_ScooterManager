@@ -13,6 +13,7 @@ from Login.PageServiceEngineer import PageServiceEngineer
 from Login.PageSystemAdmin import PageSystemAdmin
 from Login.PageSuperAdmin import PageSuperAdmin
 
+from Utils.BackupHandler import BackupHandler
 import Utils.logger as l
 
 
@@ -61,6 +62,31 @@ if __name__ == "__main__":
     MainDb.initialize()
     # reset_db()
 
+    # passed = AuthHandler.login("super_admin", "Admin_123?")
+    # 
+    # BackupHandler.createBackup()
+    # backups = BackupHandler.getBackupList()
+    # for b in backups.values():
+    #     BackupHandler.restoreBackup(b.filename)
+    #     passed = AuthHandler.login("super_admin", "Admin_123?")
+    # 
+    # backups = BackupHandler.getBackupList()
+    # for b in list(backups.values()):
+    #     BackupHandler.deleteBackup(b.filename)
+    # 
+    # BackupHandler.createBackup()
+    # sysAdmins = BackupHandler.getSystemAdmins()
+    # for b in backups.values():
+    #     sa = list(sysAdmins.values())[0]
+    #     BackupHandler.createBackupCode(sa.Username, b.filename)
+    #     codes = BackupHandler.getBackupCodeList()
+    #     for c in codes.values():
+    #         BackupHandler.restoreBackupCode(c.code)
+    #         passed = AuthHandler.login("super_admin", "Admin_123?")
+# 
+    # for c in codes.values():
+    #     print(c.code, c.username, c.filename, c.used)
+
     print("--start--\n\n")
 
     print("Welcome to the Urban Mobility backend system.\n\n")
@@ -75,7 +101,7 @@ if __name__ == "__main__":
         page = None
         role = AuthHandler.getCurrentUser().Role
 
-        if role != "ServiceEngineer" and role != "SystemAdmin" and role != "SuperAdmin":
+        if role not in ["ServiceEngineer", "SystemAdmin", "SuperAdmin"]:
             print("User found without defined role. logging out.")
             exit()
 

@@ -54,11 +54,10 @@ class BackupCodesDAO:
 
             for b in backupCodes:
                 code = decrypt(b[0])
-                userID = decrypt(b[1])
-                filename = decrypt(b[2])
-                hash = decrypt(b[3])
-                username = decrypt(b[4])
-                used = b[5]
+                filename = decrypt(b[1])
+                hash = decrypt(b[2])
+                username = decrypt(b[3])
+                used = b[4]
 
                 backupCode = BackupCode(filename, hash, username, code, used)
                 self.cache[code] = backupCode
@@ -97,6 +96,26 @@ class BackupCodesDAO:
             return False
     
     # delete methods
+
+    def deleteCodesForBackup(self, filename: str) -> bool:
+        cursor = self.conn.cursor()
+        backupCodes = cursor.execute("SELECT * FROM backupCodes").fetchall()
+
+        for b in backupCodes:
+            if decrypt(b[1]) == filename:
+                cursor.execute("DELETE FROM backupCodes WHERE Filename = ?", [b[1]])
+        
+        self.conn.commit()
+        if cursor.rowcount > 0:
+            cursor.close()
+            # Update cache
+            codes_to_delete = [code for code, backupCode in self.cache.items() if backupCode.filename == filename]
+            for code in codes_to_delete:
+                del self.cache[code]
+            return True
+        else:
+            cursor.close()
+            return False
 
     def deleteBackupCode(self, code: str) -> bool:
         cursor = self.conn.cursor()
