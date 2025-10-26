@@ -2,20 +2,20 @@ import datetime
 import random
 
 class Traveler:
-    def __init__(self, firstName, lastName, birthday, gender, streetName, houseNumber, zipCode, city, email, phoneNumber, drivingLicenseNumber, registrationDate=None):
-        self.CustomerID = self._generateCustomerID()
-        self.FirstName = firstName
-        self.LastName = lastName
-        self.Birthday = birthday
-        self.Gender = gender
-        self.StreetName = streetName
-        self.HouseNumber = houseNumber
-        self.ZipCode = zipCode
-        self.City = city
-        self.Email = email
-        self.PhoneNumber = phoneNumber
-        self.DrivingLicenseNumber = drivingLicenseNumber
-        self.RegistrationDate = datetime.datime.now() if registrationDate == None else registrationDate
+    def __init__(self, FirstName, LastName, Birthday, Gender, StreetName, HouseNumber, ZipCode, City, Email, PhoneNumber, DrivingLicenseNumber, RegistrationDate=None, CustomerID=None):
+        self.CustomerID = self._generateCustomerID() if CustomerID is None else CustomerID
+        self.FirstName = FirstName
+        self.LastName = LastName
+        self.Birthday = Birthday
+        self.Gender = Gender
+        self.StreetName = StreetName
+        self.HouseNumber = HouseNumber
+        self.ZipCode = ZipCode
+        self.City = City
+        self.Email = Email
+        self.PhoneNumber = PhoneNumber
+        self.DrivingLicenseNumber = DrivingLicenseNumber
+        self.RegistrationDate = datetime.datetime.now() if RegistrationDate == None else RegistrationDate
 
     def _generateCustomerID(self):
         today = datetime.datetime.now()

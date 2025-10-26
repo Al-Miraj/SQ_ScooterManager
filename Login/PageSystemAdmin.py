@@ -1,12 +1,12 @@
 from Login.PageBase import PageBase
-from Roles.SystemAdmin import SystemAdmin
 
+from Models.User import User
 from Utils.InputValidator import InputHandler
 
 
 
-
-class PageSystemAdmin(PageBase[SystemAdmin]):
+        
+class PageSystemAdmin(PageBase[User]):
 
 
     def Run(self):

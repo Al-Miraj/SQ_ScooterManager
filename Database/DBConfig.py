@@ -1,6 +1,7 @@
 from .DCM import DCM
 from .DataAccesObjects.UsersDAO import UsersDAO
 from .DataAccesObjects.ScootersDAO import ScootersDAO
+from .DataAccesObjects.TravelersDAO import TravelersDAO
 
 class DBConfig:
     DBName = "UrbanMobilityDB"
@@ -15,3 +16,4 @@ class DBConfig:
     dcm.connect()
     usersDAO = UsersDAO(dcm.conn)
     scootersDAO = ScootersDAO(dcm.conn)
+    travelersDAO = TravelersDAO(dcm.conn)

@@ -1,10 +1,10 @@
 from Login.PageBase import PageBase
-from Roles.ServiceEngineer import  ServiceEngineer
 
+from Models.User import User
 from Utils.InputValidator import InputHandler
 
 
-class PageServiceEngineer(PageBase[ServiceEngineer]):
+class PageServiceEngineer(PageBase[User]):
 
     def Run(self):
         while True:

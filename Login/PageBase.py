@@ -1,7 +1,5 @@
 from typing import Generic, TypeVar
-from Roles.User import User
-from Roles.ServiceEngineer import ServiceEngineer
-from Roles.SystemAdmin import SystemAdmin
+from Models.User import User
 from Utils.security import verify_password, hash_password
 from Database.DBConfig import DBConfig
 
@@ -26,7 +24,7 @@ class PageBase(Generic[T]):
                 if newPassword != oldPassword:
                     if newPassword == newPasswordRepeat:
                         newPasswordHashed = hash_password(newPassword + self.User.Username)
-                        self.User.UpdateOwnPassword(newPasswordHashed)
+
                         result = DBConfig.usersDAO.updateUserPassword(self.User.Username, self.User.Password)
                         if result:
                             print("Password has been updated.")
@@ -70,11 +68,12 @@ class PageBase(Generic[T]):
                             if passwordIsConfirmed and usernameNotFound:
                                 user = None
                                 if role == "ServiceEngineer":
-                                    user = ServiceEngineer(username, password, firstName, lastName)
+                                    user = User(username, password, firstName, lastName, "ServiceEngineer")
                                 elif role == "SystemAdmin":
-                                    user = SystemAdmin(username, password, firstName, lastName)
+                                    user = User(username, password, firstName, lastName, "SystemAdmin")
                                 else:
                                     print(f"Role of new user unclear. Adding {role} failed.")
+
                                 if user != None:
                                     result = DBConfig.usersDAO.insertUsers([user])
                                     if result:
@@ -86,7 +85,7 @@ class PageBase(Generic[T]):
                                         l.logEvent(self.User.Username, f"Failed DB update for adding new user ({user.Username})", suspicious= True)
                                 else:
                                     print(f"Unable to create new user. Adding {role} failed.")
-                                    l.logEvent(self.User.Username, f"Adding new {role} ({user.Username}) failed because current user has unvalid role", suspicious= True)
+                                    l.logEvent(self.User.Username, f"Adding new {role} ({username}) failed because current user has invalid role", suspicious= True)
                             else:
                                 print(f"Something went wrong. Adding {role} failed.")
                         else:
@@ -118,7 +117,7 @@ class PageBase(Generic[T]):
                         password = input("Password: ")
                         if InputHandler.checkPasswordFormat(password):
                             if verify_password(password + self.User.Username, self.User.Password):
-                                result = DBConfig.usersDAO.DeleteUserByObject(user)
+                                result = DBConfig.usersDAO.deleteUser(user.Username)
                                 if result:
                                     print(f"{role} deleted succesfully")
                                     l.logEvent(self.User.Username, f"Deleting {role} ({user.Username}) succesful")
@@ -185,7 +184,7 @@ class PageBase(Generic[T]):
             print("invalid format for username")
     
 
-    def updateServiceEngineerFN(self, serviceEngineer: ServiceEngineer):
+    def updateServiceEngineerFN(self, serviceEngineer: User):
         newFirstName = input("Enter the new First Name: ")
         if InputHandler.checkFirstName(newFirstName):
             if newFirstName == serviceEngineer.FirstName:
@@ -202,7 +201,7 @@ class PageBase(Generic[T]):
         else:
             print("invalid format for first name")
 
-    def updateServiceEngineerLN(self, serviceEngineer: ServiceEngineer):
+    def updateServiceEngineerLN(self, serviceEngineer: User):
         newLastName = input("Enter the new Last Name: ")
         if InputHandler.checkLastName(newLastName):
             if newLastName == serviceEngineer.LastName:
@@ -281,7 +280,7 @@ class PageBase(Generic[T]):
         else:
             print("Input not valid. Updating Service Engineer failed.")
 
-    def updateSystemAdminFN(self, systemAdmin: SystemAdmin):
+    def updateSystemAdminFN(self, systemAdmin: User):
         newFirstName = input("Enter the new First Name: ")
         if InputHandler.checkFirstName(newFirstName):
             if newFirstName == systemAdmin.FirstName:
@@ -299,7 +298,7 @@ class PageBase(Generic[T]):
             print("invalid input for first name")
 
 
-    def updateSystemAdminLN(self, systemAdmin: SystemAdmin):
+    def updateSystemAdminLN(self, systemAdmin: User):
         newLastName = input("Enter the new Last Name: ")
         if InputHandler.checkLastName(newLastName):
             if newLastName == systemAdmin.LastName:
@@ -330,7 +329,7 @@ class PageBase(Generic[T]):
                     password = input("Password: ")
                     if InputHandler.checkPasswordFormat(password):
                         if verify_password(password + self.User.Username, self.User.Password):
-                            result = DBConfig.usersDAO.DeleteUserByObject(self.User)
+                            result = DBConfig.usersDAO.deleteUser(self.User.Username)
                             if result:
                                 print("Your Account has been deleted succesfully")
                                 l.logEvent(self.User.Username, f"Deleting own account succesful")
