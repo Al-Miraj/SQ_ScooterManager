@@ -38,6 +38,16 @@ class UsersDAO:
         
     # read methods
 
+    def search(self, searchTerm: str) -> dict[str, User]:
+        """return dict of user objects whose username contains the search term"""
+        result : dict[str, User] = {}
+        for username, user in self.getAllUsers().items():
+            for value in {**user.__dict__}.values():
+                if searchTerm in str(value).lower():
+                    result[username] = user
+                    break
+        return result
+
     def getAllUsers(self) -> dict[str, User]:
         """return dict of user objects from db if cache is empty, otherwise from cache"""
         if not self.cache:

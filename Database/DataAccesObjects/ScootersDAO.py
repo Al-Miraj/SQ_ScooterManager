@@ -45,6 +45,16 @@ class ScootersDAO:
             return False
         
     # Read methods
+    
+    def search(self, searchTerm: str) -> dict[str, Scooter]:
+        """return dict of user objects whose username contains the search term"""
+        result : dict[str, Scooter] = {}
+        for serialNumber, scooter in self.getAllScooters().items():
+            for value in {**scooter.__dict__}.values():
+                if searchTerm in str(value).lower():
+                    result[serialNumber] = scooter
+                    break
+        return result
 
     def getAllScooters(self) -> dict[str, Scooter]:
         """return dict of scooter objects from db if cache is empty, otherwise from cache"""

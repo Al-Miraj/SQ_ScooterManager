@@ -4,8 +4,8 @@ from Utils.security import verify_password, hash_password
 from Database.MainDb import MainDb
 
 from Utils.InputValidator import InputHandler
+from Utils.BackupHandler import BackupHandler
 import Utils.logger as l
-import Utils.backupService as b
 
 class PageBase():
     def __init__(self):
@@ -18,10 +18,10 @@ class PageBase():
         newPasswordRepeat = input("Repeat new password: ")
 
         if InputHandler.checkPasswordFormat(oldPassword) and InputHandler.checkPasswordFormat(newPassword) and InputHandler.checkPasswordFormat(newPasswordRepeat):
-            if verify_password(oldPassword + self.User.Username, self.User.Password):
+            if verify_password(oldPassword, self.User.Password):
                 if newPassword != oldPassword:
                     if newPassword == newPasswordRepeat:
-                        newPasswordHashed = hash_password(newPassword + self.User.Username)
+                        newPasswordHashed = hash_password(newPassword)
 
                         result = MainDb.users().updateUserPassword(self.User.Username, self.User.Password)
                         if result:

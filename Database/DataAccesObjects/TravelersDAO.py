@@ -42,6 +42,16 @@ class TravelersDAO:
             return False
     
     # Read methods
+    
+    def search(self, searchTerm: str) -> dict[str, Traveler]:
+        """return dict of traveler objects whose attributes contain the search term"""
+        result : dict[str, Traveler] = {}
+        for customerID, traveler in self.getAllTravelers().items():
+            for value in {**traveler.__dict__}.values():
+                if searchTerm in str(value).lower():
+                    result[customerID] = traveler
+                    break
+        return result
 
     def getAllTravelers(self) -> dict[str, Traveler]:
         """return dict of traveler objects from db if cache is empty, otherwise from cache"""
