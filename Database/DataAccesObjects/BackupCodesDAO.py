@@ -50,7 +50,7 @@ class BackupCodesDAO:
         """return dict of backup code objects from db if cache is empty, otherwise from cache"""
         if not self.cache:
             cursor = self.conn.cursor()
-            backupCodes = cursor.execute("SELECT * FROM backup_codes").fetchall()
+            backupCodes = cursor.execute("SELECT * FROM backupCodes").fetchall()
 
             for b in backupCodes:
                 code = decrypt(b[0])

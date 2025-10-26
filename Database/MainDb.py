@@ -25,11 +25,12 @@ class MainDb:
 
     @classmethod
     def initialize(cls):
-        cls.mainConn = cls.connect()
-        cls.backupConn = cls.connect()
+        cls.mainConn = cls.connect(cls.databaseFile)
         cls.__users = UsersDAO(cls.mainConn)
         cls.__scooters = ScootersDAO(cls.mainConn)
         cls.__travelers = TravelersDAO(cls.mainConn)
+
+        cls.backupConn = cls.connect(cls.backupFile)
         cls.__backupCodes = BackupCodesDAO(cls.backupConn)
         cls.__backups = BackupsDAO(cls.backupConn)
 
@@ -54,8 +55,8 @@ class MainDb:
         return cls.__backups # type: ignore
 
     @classmethod
-    def connect(cls):
-        return sqlite3.connect(os.path.join(os.path.dirname(__file__), cls.databaseFile))
+    def connect(cls, file):
+        return sqlite3.connect(os.path.join(os.path.dirname(__file__), file))
 
     def disconnect(self):
         if self.mainConn:
